@@ -36,3 +36,4 @@ async function main() {
 }
 
 console.log(`[${formatDate(new Date())}] application started`);
+main();
