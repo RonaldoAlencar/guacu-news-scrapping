@@ -34,3 +34,5 @@ async function main() {
   const useCasesPromises = Promise.all([ oRegionalNews.execute(), portalDaCidadeMogiMirimNews.execute() ]);
   await useCasesPromises;
 }
+
+console.log(`[${formatDate(new Date())}] application started`);
