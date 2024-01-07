@@ -11,8 +11,7 @@ export default class RabbitMQAdapter implements Queue {
   async on (queueName: string, callback: Function): Promise<void> {
     const channel = await this.connection.createChannel();
     await channel.assertQueue(queueName, { durable: true });
-    channel.consume(queueName, async  (message: any) => {
-      console.log(`Received message: ${message.content.toString()}`);
+    await channel.consume(queueName, async (message: any) => {
       const input = JSON.parse(message.content.toString());
       await callback(input);
       channel.ack(message);
