@@ -25,9 +25,13 @@ export default class QueueController {
     console.log(`Sending ${this.messages.length} messages`);
 
     for (const message of this.messages) {
-      await this.sendTelegramMessage.send(message);
-      const position = this.messages.indexOf(message);
-      this.messages.splice(position, 1);
+      try {
+        await this.sendTelegramMessage.send(message);
+        const position = this.messages.indexOf(message);
+        this.messages.splice(position, 1);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
