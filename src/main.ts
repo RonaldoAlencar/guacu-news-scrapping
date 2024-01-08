@@ -12,6 +12,7 @@ import NewsRepositoryDatabase from "./infra/repository/NewsRepositoryDatabase";
 import cron from 'node-cron';
 import formatDate from "./utils/formatDate";
 import AxiosAdapter from "./infra/adapter/axios/AxiosAdapter";
+import GuacuAgora from "./infra/adapter/news-scrapper/cheerio/GuacuAgora";
 
 cron.schedule('* 1 * * *', () => {
   console.log(`[${formatDate(new Date())}] running a task every hour`);
@@ -28,11 +29,13 @@ async function main() {
   new QueueController(queue, sendTelegramMessage);
   const oRegionalNewsScrapperAdapter = new ORegionalNewsScrapperAdapter(cloudscrapperAdapter);
   const PortalDaCidadeMogiMirimAdapter = new PortalDaCidadeMogiMirimNewsScrapperAdapter(cloudscrapperAdapter);
+  const guacuAgora = new GuacuAgora(cloudscrapperAdapter);
 
   const oRegionalNews = new GetNews(newsRepository, oRegionalNewsScrapperAdapter, queue);
   const portalDaCidadeMogiMirimNews = new GetNews(newsRepository, PortalDaCidadeMogiMirimAdapter, queue);
+  const guacuAgoraNews = new GetNews(newsRepository, guacuAgora, queue);
 
-  const useCasesPromises = Promise.all([ oRegionalNews.execute(), portalDaCidadeMogiMirimNews.execute() ]);
+  const useCasesPromises = Promise.all([ oRegionalNews.execute(), portalDaCidadeMogiMirimNews.execute(), guacuAgoraNews.execute() ]);
   await useCasesPromises;
 }
 

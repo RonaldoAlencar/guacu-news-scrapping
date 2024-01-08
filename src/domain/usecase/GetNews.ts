@@ -7,7 +7,7 @@ export default class GetNews {
   constructor(readonly newsRepository: NewsRepository, readonly newsScrapperAdapter: NewsScrapperAdapter, readonly queue: Queue) {}
 
   async execute(): Promise<void> {
-    const news = await this.newsScrapperAdapter.scrapURL(1);
+    const news = await this.newsScrapperAdapter.scrapURL(3);
     
     for (const n of news) {
       const newsEntity = new News(n.id, n.title, n.link,  n.postedAt);
