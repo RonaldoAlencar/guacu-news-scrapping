@@ -11,6 +11,7 @@ import DatabaseConnection from "./infra/repository/DatabaseConnection";
 import NewsRepositoryDatabase from "./infra/repository/NewsRepositoryDatabase";
 import cron from 'node-cron';
 import formatDate from "./utils/formatDate";
+import AxiosAdapter from "./infra/adapter/axios/AxiosAdapter";
 
 cron.schedule('* 1 * * *', () => {
   console.log(`[${formatDate(new Date())}] running a task every hour`);
@@ -23,7 +24,7 @@ async function main() {
   const newsRepository = new NewsRepositoryDatabase(await databaseConnection.getConnection());
   const queue = new RabbitMQAdapter();
   await queue.connect();
-  const sendTelegramMessage = new SendTelegramMessage();
+  const sendTelegramMessage = new SendTelegramMessage(new AxiosAdapter());
   new QueueController(queue, sendTelegramMessage);
   const oRegionalNewsScrapperAdapter = new ORegionalNewsScrapperAdapter(cloudscrapperAdapter);
   const PortalDaCidadeMogiMirimAdapter = new PortalDaCidadeMogiMirimNewsScrapperAdapter(cloudscrapperAdapter);
