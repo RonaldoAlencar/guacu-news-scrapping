@@ -14,7 +14,7 @@ import formatDate from "./utils/formatDate";
 import AxiosAdapter from "./infra/adapter/axios/AxiosAdapter";
 import GuacuAgora from "./infra/adapter/news-scrapper/cheerio/GuacuAgora";
 
-cron.schedule('* 1 * * *', () => {
+cron.schedule('0 * * * *', () => {
   console.log(`[${formatDate(new Date())}] running a task every hour`);
   main();
 });
