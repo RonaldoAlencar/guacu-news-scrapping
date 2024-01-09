@@ -2,7 +2,7 @@ import HTTPRequests from "../../../../domain/adapters/HTTPRequests";
 import NewsScrapperAdapter from "../../../../domain/adapters/NewsScrapperAdapter";
 import { TNews } from "./ORegionalNewsScrapperAdapter";
 
-export default class GuacuAgora implements NewsScrapperAdapter {
+export default class GuacuAgoraAdapter implements NewsScrapperAdapter {
   private readonly url: string = "https://guacuagora.com.br/page/{pageNumber}/?s";
 
   constructor(private readonly httpAdapter: HTTPRequests) {}

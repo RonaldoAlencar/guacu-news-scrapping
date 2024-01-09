@@ -1,10 +1,10 @@
 import CloudscrapperAdapter from "../../cloudscrapper/CloudscrapperAdapter"
-import GuacuAgora from "./GuacuAgora"
+import GuacuAgoraAdapter from "./GuacuAgoraAdapter"
 
 describe('GuacuAgora', () => {
   const url = 'https://guacuagora.com.br/?s='
   const httpAdapter = new CloudscrapperAdapter()
-  const guacuAgora = new GuacuAgora(httpAdapter)
+  const guacuAgora = new GuacuAgoraAdapter(httpAdapter)
 
   describe('getSiteBody', () => {
     it('should return html body', async () => {
