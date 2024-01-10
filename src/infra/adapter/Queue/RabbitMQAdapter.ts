@@ -4,8 +4,19 @@ import Queue from "../../../domain/adapters/Queue";
 export default class RabbitMQAdapter implements Queue {
   connection: any;
 
-  async connect (): Promise<void> {
-    this.connection = await amqp.connect("amqp://localhost");
+  async connect (connectionName: string): Promise<void> {
+    try {
+      this.connection = await amqp.connect("amqp://localhost", {
+        clientProperties: {
+          connection_name: connectionName,
+        },
+      });
+      console.log("Connected to RabbitMQ");
+    } catch (err) {
+      console.log("Error connecting to RabbitMQ");
+      console.log(err);
+      throw err;
+    }
   }
 
   async on (queueName: string, callback: Function): Promise<void> {
