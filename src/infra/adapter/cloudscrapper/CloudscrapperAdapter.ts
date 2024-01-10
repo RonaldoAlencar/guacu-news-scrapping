@@ -13,4 +13,8 @@ export default class CloudscrapperAdapter implements HTTPRequests {
     });
     return response;
   }
+
+  async post(url: string, params?: any): Promise<any> {
+    throw new Error("Method not implemented.");
+  }
 }

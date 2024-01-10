@@ -7,8 +7,8 @@ export default class AxiosAdapter implements HTTPRequests {
     return response.data;
   }
 
-  async post<T>(url: string, data?: any): Promise<T> {
-    const response: AxiosResponse = await axios.post<T>(url, data);
+  async post<T>(url: string, data?: any, params?: any): Promise<T> {
+    const response: AxiosResponse = await axios.post<T>(url, data, params);
     return response.data;
   }
 }
