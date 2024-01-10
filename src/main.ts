@@ -11,10 +11,10 @@ import NewsRepositoryDatabase from "./infra/repository/NewsRepositoryDatabase";
 import cron from 'node-cron';
 import formatDate from "./utils/formatDate";
 import AxiosAdapter from "./infra/adapter/axios/AxiosAdapter";
-import App from "./application/app";
 import GuacuAgoraAdapter from "./infra/adapter/news-scrapper/cheerio/GuacuAgoraAdapter";
 import PortalTribunaDoGuacuScrapper from "./infra/adapter/news-scrapper/cheerio/PortalTribunaDoGuacuScrapperAdapter";
 import NewsScrapperAdapter from './domain/adapters/NewsScrapperAdapter';
+import App from './application/App';
 
 cron.schedule('0 * * * *', () => {
   console.log(`[${formatDate(new Date())}] running a task every hour`);
@@ -23,14 +23,14 @@ cron.schedule('0 * * * *', () => {
 
 (async () => {
   const queue = new RabbitMQAdapter();
-  await queue.connect('telegram-message-sender');
+  await queue.connect('consumer');
   new QueueController(queue, new SendTelegramMessage(new AxiosAdapter()));
 })();
 
 async function main() {
   const cloudscrapperAdapter = new CloudscrapperAdapter();
   const queue = new RabbitMQAdapter();
-  await queue.connect('news-scrapper');
+  await queue.connect('publisher');
 
   const adapters: NewsScrapperAdapter[] = [
     new ORegionalNewsScrapperAdapter(cloudscrapperAdapter),
