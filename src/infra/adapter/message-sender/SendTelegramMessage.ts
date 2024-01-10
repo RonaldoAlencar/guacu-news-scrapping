@@ -7,7 +7,7 @@ export default class SendTelegramMessage implements SendMessage {
   async send (message: string): Promise<void> {
     const encodedMessage = encodeURI(message);
     console.log(`Sending message to telegram`);
-    //await this.httpRequests.get(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${process.env.TELEGRAM_CHAT_ID}&text=${encodedMessage}`);
-    //await new Promise(resolve => setTimeout(resolve, 5000));
+    await this.httpRequests.get(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${process.env.TELEGRAM_CHAT_ID}&text=${encodedMessage}`);
+    await new Promise(resolve => setTimeout(resolve, 5000));
   }
 }
