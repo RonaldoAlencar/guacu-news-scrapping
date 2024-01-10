@@ -14,6 +14,7 @@ import AxiosAdapter from "./infra/adapter/axios/AxiosAdapter";
 import App from "./application/app";
 import GuacuAgoraAdapter from "./infra/adapter/news-scrapper/cheerio/GuacuAgoraAdapter";
 import PortalTribunaDoGuacuScrapper from "./infra/adapter/news-scrapper/cheerio/PortalTribunaDoGuacuScrapperAdapter";
+import NewsScrapperAdapter from './domain/adapters/NewsScrapperAdapter';
 
 cron.schedule('0 * * * *', () => {
   console.log(`[${formatDate(new Date())}] running a task every hour`);
@@ -31,16 +32,19 @@ async function main() {
   const queue = new RabbitMQAdapter();
   await queue.connect('news-scrapper');
 
-  const app = new App(
-    new NewsRepositoryDatabase(await new DatabaseConnection('localhost','root','root','news').getConnection()),
-    queue,
+  const adapters: NewsScrapperAdapter[] = [
     new ORegionalNewsScrapperAdapter(cloudscrapperAdapter),
     new PortalDaCidadeMogiMirimNewsScrapperAdapter(cloudscrapperAdapter),
     new GuacuAgoraAdapter(cloudscrapperAdapter),
-    new PortalTribunaDoGuacuScrapper(cloudscrapperAdapter),
-  );
+    new PortalTribunaDoGuacuScrapper(cloudscrapperAdapter)
+  ];
 
-  await app.run();
+  const app = new App(
+    new NewsRepositoryDatabase(await new DatabaseConnection('localhost','root','root','news').getConnection()),
+    queue,
+    adapters
+  );
+  await app.execute();
 }
 
 console.log(`[${formatDate(new Date())}] application started`);
