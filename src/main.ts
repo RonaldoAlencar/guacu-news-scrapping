@@ -13,8 +13,8 @@ import AxiosAdapter from "./infra/adapter/axios/AxiosAdapter";
 import GuacuAgoraAdapter from "./infra/adapter/news-scrapper/cheerio/GuacuAgoraAdapter";
 import PortalTribunaDoGuacuScrapper from "./infra/adapter/news-scrapper/cheerio/PortalTribunaDoGuacuScrapperAdapter";
 import NewsScrapperAdapter from './domain/adapters/NewsScrapperAdapter';
-import App from './application/App';
 import Logger from './infra/adapter/Logger/Logger';
+import App from './application/App';
 const logger = new Logger();
 
 cron.schedule('0 * * * *', () => {
