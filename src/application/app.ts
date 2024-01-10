@@ -1,3 +1,4 @@
+import LoggerAdapter from "../domain/adapters/LoggerAdapter";
 import NewsScrapperAdapter from "../domain/adapters/NewsScrapperAdapter";
 import Queue from "../domain/adapters/Queue";
 import NewsRepository from "../domain/repository/NewsRepository";
@@ -8,6 +9,7 @@ export default class App {
       readonly newsRepository: NewsRepository,
       readonly queue: Queue,
       readonly newsScrappersAdapters: NewsScrapperAdapter[],
+      readonly logger: LoggerAdapter
     ) {}
 
     async execute() {
@@ -18,10 +20,10 @@ export default class App {
 
       try {
         await Promise.all(useCasesPromises);
-        console.log('All news scrapped!');
+        this.logger.logInfo('News scrapped successfully!');
       } catch (error) {
-        console.error(error);
-        console.log('Error scrapping news!');
+        this.logger.logError(error as string);
+        this.logger.logError('Error scrapping news');
       }
     }
 }

@@ -1,8 +1,11 @@
 import amqp from "amqplib";
 import Queue from "../../../domain/adapters/Queue";
+import LoggerAdapter from "../../../domain/adapters/LoggerAdapter";
 
 export default class RabbitMQAdapter implements Queue {
   connection: any;
+
+  constructor (readonly logger: LoggerAdapter) {}
 
   async connect (connectionName: string): Promise<void> {
     try {
@@ -11,10 +14,10 @@ export default class RabbitMQAdapter implements Queue {
           connection_name: connectionName,
         },
       });
-      console.log("Connected to RabbitMQ");
+      this.logger.logInfo("Connected to RabbitMQ");
     } catch (err) {
-      console.log("Error connecting to RabbitMQ");
-      console.log(err);
+      this.logger.logError("Error connecting to RabbitMQ");
+      this.logger.logError(err as string);
       throw err;
     }
   }

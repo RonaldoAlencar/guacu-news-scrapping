@@ -9,27 +9,28 @@ import PortalDaCidadeMogiMirimNewsScrapperAdapter from "./infra/adapter/news-scr
 import DatabaseConnection from "./infra/repository/DatabaseConnection";
 import NewsRepositoryDatabase from "./infra/repository/NewsRepositoryDatabase";
 import cron from 'node-cron';
-import formatDate from "./utils/formatDate";
 import AxiosAdapter from "./infra/adapter/axios/AxiosAdapter";
 import GuacuAgoraAdapter from "./infra/adapter/news-scrapper/cheerio/GuacuAgoraAdapter";
 import PortalTribunaDoGuacuScrapper from "./infra/adapter/news-scrapper/cheerio/PortalTribunaDoGuacuScrapperAdapter";
 import NewsScrapperAdapter from './domain/adapters/NewsScrapperAdapter';
 import App from './application/App';
+import Logger from './infra/adapter/Logger/Logger';
+const logger = new Logger();
 
 cron.schedule('0 * * * *', () => {
-  console.log(`[${formatDate(new Date())}] running a task every hour`);
+  logger.logInfo('Running cron job');
   main();
 });
 
 (async () => {
-  const queue = new RabbitMQAdapter();
+  const queue = new RabbitMQAdapter(logger);
   await queue.connect('consumer');
   new QueueController(queue, new SendTelegramMessage(new AxiosAdapter()));
 })();
 
 async function main() {
   const cloudscrapperAdapter = new CloudscrapperAdapter();
-  const queue = new RabbitMQAdapter();
+  const queue = new RabbitMQAdapter(logger);
   await queue.connect('publisher');
 
   const adapters: NewsScrapperAdapter[] = [
@@ -40,12 +41,13 @@ async function main() {
   ];
 
   const app = new App(
-    new NewsRepositoryDatabase(await new DatabaseConnection('localhost','root','root','news').getConnection()),
+    new NewsRepositoryDatabase(await new DatabaseConnection('localhost','root','root','news', logger).getConnection()),
     queue,
-    adapters
+    adapters,
+    logger
   );
   await app.execute();
 }
 
-console.log(`[${formatDate(new Date())}] application started`);
+logger.logInfo(`Application started`);
 main();

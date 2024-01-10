@@ -3,7 +3,7 @@ import mysql from 'mysql2/promise';
 export default class DatabaseConnection {
   private connection: mysql.Connection | undefined;
 
-  constructor(private host: string, private user: string, private password: string | undefined, private database: string) {
+  constructor(private host: string, private user: string, private password: string | undefined, private database: string, readonly logger: any) {
     this.init();
   }
 
@@ -18,8 +18,7 @@ export default class DatabaseConnection {
 
   async getConnection(): Promise<mysql.Connection> {
     if (!this.connection) { await this.init(); }
-
-    console.log("Database Connected!")
+    this.logger.logInfo("Connected to Database");
     return this.connection!;
   }
 }
