@@ -5,7 +5,7 @@ import News from "../../../domain/entities/News";
 export default class QueueController {
   private messages: string[] = [];
 
-  constructor(readonly queue: Queue, readonly sendTelegramMessage: SendMessage) {
+  constructor(readonly queue: Queue, readonly sendMessage: SendMessage) {
     const processMessages = async () => {
       if (this.messages.length > 0) {
         await this.sendMessages();
@@ -26,7 +26,7 @@ export default class QueueController {
 
     for (const message of this.messages) {
       try {
-        await this.sendTelegramMessage.send(message);
+        await this.sendMessage.send(message);
         const position = this.messages.indexOf(message);
         this.messages.splice(position, 1);
       } catch (error) {
@@ -34,6 +34,4 @@ export default class QueueController {
       }
     }
   }
-
-  
 }

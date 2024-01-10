@@ -1,7 +1,6 @@
 import dotenv from 'dotenv'; 
 dotenv.config();
 import QueueController from "./infra/adapter/Queue/QueueController";
-import RabbitMQAdapter from "./infra/adapter/Queue/RabbitMQAdapter";
 import CloudscrapperAdapter from "./infra/adapter/cloudscrapper/CloudscrapperAdapter";
 import SendTelegramMessage from "./infra/adapter/message-sender/SendTelegramMessage";
 import ORegionalNewsScrapperAdapter from "./infra/adapter/news-scrapper/cheerio/ORegionalNewsScrapperAdapter";
@@ -15,6 +14,8 @@ import PortalTribunaDoGuacuScrapper from "./infra/adapter/news-scrapper/cheerio/
 import NewsScrapperAdapter from './domain/adapters/NewsScrapperAdapter';
 import Logger from './infra/adapter/Logger/Logger';
 import App from './application/App';
+import SendWhatsappMessage from './infra/adapter/message-sender/SendWhatsappMessage';
+import KafkaAdapter from './infra/adapter/Queue/KafkaAdapter';
 const logger = new Logger();
 
 cron.schedule('0 * * * *', () => {
@@ -23,14 +24,19 @@ cron.schedule('0 * * * *', () => {
 });
 
 (async () => {
-  const queue = new RabbitMQAdapter(logger);
+  const queue = new KafkaAdapter(logger);
   await queue.connect('consumer');
   new QueueController(queue, new SendTelegramMessage(new AxiosAdapter()));
+  
+  const queue2 = new KafkaAdapter(logger);
+  await queue2.connect('consumer-2');
+  new QueueController(queue2, new SendWhatsappMessage(new AxiosAdapter()));
 })();
+
 
 async function main() {
   const cloudscrapperAdapter = new CloudscrapperAdapter();
-  const queue = new RabbitMQAdapter(logger);
+  const queue = new KafkaAdapter(logger);
   await queue.connect('publisher');
 
   const adapters: NewsScrapperAdapter[] = [
