@@ -13,17 +13,17 @@ export default class App {
     ) {}
 
     async execute() {
-      const useCasesPromises = this.newsScrappersAdapters.map(newsScrapperAdapter => { 
-        const getNews = new GetNews(this.newsRepository, newsScrapperAdapter, this.queue);
-        return getNews.execute();
+      const useCasesPromises = this.newsScrappersAdapters.map(async newsScrapperAdapter => { 
+        try {
+          const getNews = new GetNews(this.newsRepository, newsScrapperAdapter, this.queue);
+          await getNews.execute();
+          this.logger.logInfo(`News scrapped from ${newsScrapperAdapter.constructor.name}`);
+        } catch (error: any) {
+          this.logger.logError(error);
+          this.logger.logError(`Error scrapping news from ${newsScrapperAdapter.constructor.name}`);
+        }
       });
 
-      try {
-        await Promise.all(useCasesPromises);
-        this.logger.logInfo('News scrapped successfully!');
-      } catch (error) {
-        this.logger.logError(error as string);
-        this.logger.logError('Error scrapping news');
-      }
+      await Promise.all(useCasesPromises);
     }
 }
