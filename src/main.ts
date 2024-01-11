@@ -53,6 +53,7 @@ async function main() {
     logger
   );
   await app.execute();
+  logger.logInfo(`Application finished`);
 }
 
 logger.logInfo(`Application started`);
