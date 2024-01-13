@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 import QueueController from "./infra/adapter/Queue/QueueController";
 import CloudscrapperAdapter from "./infra/adapter/cloudscrapper/CloudscrapperAdapter";
-import SendTelegramMessage from "./infra/adapter/message-sender/SendTelegramMessage";
 import ORegionalNewsScrapperAdapter from "./infra/adapter/news-scrapper/cheerio/ORegionalNewsScrapperAdapter";
 import PortalDaCidadeMogiMirimNewsScrapperAdapter from "./infra/adapter/news-scrapper/cheerio/PortalDaCidadeMogiMirimNewsScrapperAdapter";
 import DatabaseConnection from "./infra/repository/DatabaseConnection";
