@@ -23,11 +23,7 @@ cron.schedule('0 * * * *', () => {
   main();
 });
 
-(async () => {
-  const queue = new KafkaAdapter(logger);
-  await queue.connect('consumer');
-  new QueueController(queue, new SendTelegramMessage(new AxiosAdapter(), logger));
-  
+(async () => {  
   const queue2 = new KafkaAdapter(logger);
   await queue2.connect('consumer-2');
   new QueueController(queue2, new SendWhatsappMessage(new AxiosAdapter(), logger));
