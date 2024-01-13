@@ -1,14 +1,26 @@
-import Logger from "../Logger/Logger";
-import AxiosAdapter from "../axios/AxiosAdapter";
+import HTTPRequests from "../../../domain/adapters/HTTPRequests";
+import LoggerAdapter from "../../../domain/adapters/LoggerAdapter";
 import SendWhatsappMessage from "./SendWhatsappMessage";
-import dotenv from 'dotenv';
 
 describe('SendWhatsappMessage', () => {
-  dotenv.config();
+  let mockHttpAdapter: HTTPRequests = {
+    post: jest.fn(),
+    get: jest.fn(),
+  }
+  let mockLoggerAdapter: LoggerAdapter = {
+    logDebug: jest.fn(),
+    logError: jest.fn(),
+    logInfo: jest.fn(),
+    logWarning: jest.fn(),
+  }
+
   it('should send a message to whatsapp', async () => {
-    const httpRequests = new AxiosAdapter();
-    const logger = new Logger();
-    const sendWhatsappMessage = new SendWhatsappMessage(httpRequests, logger);
-    expect(await sendWhatsappMessage.send('test')).toBe(undefined);
+    const input = { message: 'send message test' };
+    const spyPost = jest.spyOn(mockHttpAdapter, 'post');
+    const sendWhatsappMessage = new SendWhatsappMessage(mockHttpAdapter, mockLoggerAdapter);
+    await sendWhatsappMessage.send(input.message);
+
+    expect(spyPost).toHaveBeenCalled();
+    expect(spyPost.mock.calls[0][1].textMessage.text).toBe(input.message);
   });
 });

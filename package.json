@@ -10,7 +10,8 @@
     "services:up": "docker compose -f docker/docker-compose.yml up -d",
     "services:down": "docker compose -f docker/docker-compose.yml down",
     "database:seed": "ts-node seed/seed.ts",
-    "deploy": "chmod +x deploy.sh && ./deploy.sh"
+    "deploy": "chmod +x deploy.sh && ./deploy.sh",
+    "test": "jest --coverage --verbose --detectOpenHandles --forceExit"
   },
   "keywords": [],
   "author": "",
