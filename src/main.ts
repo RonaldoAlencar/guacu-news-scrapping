@@ -17,7 +17,7 @@ import SendWhatsappMessage from './infra/adapter/message-sender/SendWhatsappMess
 import KafkaAdapter from './infra/adapter/Queue/KafkaAdapter';
 const logger = new Logger();
 
-cron.schedule('0 * * * *', () => {
+cron.schedule('0 8,18 * * *', () => {
   logger.logInfo('Running cron job');
   main();
 });
