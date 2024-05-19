@@ -42,7 +42,7 @@ async function main() {
   ];
 
   const app = new App(
-    new NewsRepositoryDatabase(await new DatabaseConnection('localhost','root','root','news', logger).getConnection()),
+    new NewsRepositoryDatabase(await new DatabaseConnection('db','root','root','news', logger).getConnection()),
     queue,
     adapters,
     logger

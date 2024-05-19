@@ -10,7 +10,11 @@ export default class KafkaAdapter implements Queue {
   constructor (readonly logger: LoggerAdapter) {
     this.kafka = new Kafka({
       clientId: 'my-app',
-      brokers: ['localhost:9092'],
+      brokers: ['kafka:29092'],
+      retry: {
+        initialRetryTime: 30000,
+        retries: 50
+      }
     });
   }
 
