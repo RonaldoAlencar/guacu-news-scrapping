@@ -3,7 +3,7 @@ import NewsScrapperAdapter from "../../../../domain/adapters/NewsScrapperAdapter
 import { TNews } from "./ORegionalNewsScrapperAdapter";
 
 export default class GuacuAgoraAdapter implements NewsScrapperAdapter {
-  private readonly url: string = "https://guacuagora.com.br/page/{pageNumber}/?s";
+  private readonly url: string = "https://guacuagora.com.br/page/1/?s";
 
   constructor(private readonly httpAdapter: HTTPRequests) {}
 

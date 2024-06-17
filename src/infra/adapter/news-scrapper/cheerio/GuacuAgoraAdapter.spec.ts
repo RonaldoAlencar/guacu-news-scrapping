@@ -30,6 +30,7 @@ describe('GuacuAgora', () => {
 
   it('should scrap news from guacuagora and return an array of news', async () => {
     const news = await guacuAgora.scrapURL(1)
+    console.log(news)
     expect(news[0].link).toContain('https://guacuagora.com.br/')
     expect(news[0].title).toBeTruthy()
     expect(news[0].postedAt).toBeTruthy()
