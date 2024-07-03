@@ -11,7 +11,7 @@ export default class BullMQ implements Queue {
 
   connect(connectionName: string): Promise<void> {
     this.logger.logInfo(`Connecting to BullMQ: ${connectionName}`);
-    this.queue = new QueueBullMQ(connectionName);
+    this.queue = new QueueBullMQ(connectionName, { connection: { host: 'redis', port: 6379 } });
     return Promise.resolve();
   }
 
