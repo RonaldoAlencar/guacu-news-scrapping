@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Queue as QueueBullMQ } from 'bullmq';
 import Queue from "../../../domain/adapters/Queue";
 import LoggerAdapter from '../../../domain/adapters/LoggerAdapter';
@@ -11,7 +12,7 @@ export default class BullMQ implements Queue {
 
   connect(connectionName: string): Promise<void> {
     this.logger.logInfo(`Connecting to BullMQ: ${connectionName}`);
-    this.queue = new QueueBullMQ(connectionName, { connection: { host: 'redis', port: 6379 } });
+    this.queue = new QueueBullMQ(connectionName, { connection: { host: process.env.REDIS_HOST, port: Number(process.env.REDIS_PORT) } });
     return Promise.resolve();
   }
 

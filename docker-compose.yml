@@ -22,13 +22,6 @@ services:
       - db
     networks:
       - guacu-news-scrapping-net
-  redis:
-    container_name: redis
-    image: redis:alpine
-    ports:
-      - 6379:6379
-    networks:
-      - guacu-news-scrapping-net
 networks:
   guacu-news-scrapping-net:
     driver: bridge

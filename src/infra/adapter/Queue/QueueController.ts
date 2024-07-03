@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import Queue from "../../../domain/adapters/Queue";
 import SendMessage from "../../../domain/adapters/SendMessage";
 import { Worker, Job } from "bullmq";
@@ -11,7 +12,7 @@ export default class QueueController {
         await this.sendMessage.send(`📰 ${title}\n\n${link}\n${postedAt}`);
       },
       { 
-        connection: { host: "redis", port: 6379 }, 
+        connection: { host: process.env.REDIS_HOST, port: Number(process.env.REDIS_PORT) },
         concurrency: 1, 
         removeOnComplete: { age: 86400 }, 
         removeOnFail: { age: 86400 },
