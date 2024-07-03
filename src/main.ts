@@ -14,7 +14,7 @@ import NewsScrapperAdapter from './domain/adapters/NewsScrapperAdapter';
 import Logger from './infra/adapter/Logger/Logger';
 import App from './application/App';
 import SendWhatsappMessage from './infra/adapter/message-sender/SendWhatsappMessage';
-import KafkaAdapter from './infra/adapter/Queue/KafkaAdapter';
+import BullMQ from './infra/adapter/Queue/BullMQ';
 const logger = new Logger();
 
 cron.schedule('0 8,18 * * *', () => {
@@ -23,16 +23,16 @@ cron.schedule('0 8,18 * * *', () => {
 });
 
 (async () => {  
-  const queue2 = new KafkaAdapter(logger);
-  await queue2.connect('consumer-2');
+  const queue2 = new BullMQ(logger);
+  await queue2.connect('news');
   new QueueController(queue2, new SendWhatsappMessage(new AxiosAdapter(), logger));
 })();
 
 
 async function main() {
   const cloudscrapperAdapter = new CloudscrapperAdapter();
-  const queue = new KafkaAdapter(logger);
-  await queue.connect('publisher');
+  const queue = new BullMQ(logger);
+  queue.connect('news');
 
   const adapters: NewsScrapperAdapter[] = [
     new ORegionalNewsScrapperAdapter(cloudscrapperAdapter),
@@ -42,7 +42,7 @@ async function main() {
   ];
 
   const app = new App(
-    new NewsRepositoryDatabase(await new DatabaseConnection('db','root','root','news', logger).getConnection()),
+    new NewsRepositoryDatabase(await new DatabaseConnection('localhost','root','root','news', logger).getConnection()),
     queue,
     adapters,
     logger

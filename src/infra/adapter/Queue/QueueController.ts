@@ -1,37 +1,27 @@
 import Queue from "../../../domain/adapters/Queue";
 import SendMessage from "../../../domain/adapters/SendMessage";
-import News from "../../../domain/entities/News";
+import { Worker, Job } from "bullmq";
 
 export default class QueueController {
-  private messages: string[] = [];
-
   constructor(readonly queue: Queue, readonly sendMessage: SendMessage) {
-    const processMessages = async () => {
-      if (this.messages.length > 0) {
-        await this.sendMessages();
+    const worker = new Worker(
+      "news",
+      async (job: Job) => {
+        const { title, link, postedAt } = job.data;
+        //await this.sendMessage.send(`📰 ${title}\n\n${link}\n${postedAt}`);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      },
+      { 
+        connection: { host: "localhost", port: 6379 }, 
+        concurrency: 1, 
+        removeOnComplete: { age: 86400 }, 
+        removeOnFail: { age: 86400 },
+        runRetryDelay: 100000,
       }
-      setTimeout(processMessages, 10000);
-    };
+    );
 
-    processMessages();
-
-    this.queue.on("news", async (event: News) => {
-      console.log(`Received news: ${event.title}`);
-      this.messages.push(`📰 ${event.title}\n\n${event.link}\n${event.postedAt}`);
-    })
-  }
-
-  async sendMessages(): Promise<void> {
-    console.log(`Sending ${this.messages.length} messages`);
-
-    for (const message of this.messages) {
-      try {
-        await this.sendMessage.send(message);
-        const position = this.messages.indexOf(message);
-        this.messages.splice(position, 1);
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    worker.on("completed", (job: Job) => {
+      console.log("Job completed", job.data.title);
+    });
   }
 }
