@@ -8,11 +8,10 @@ export default class QueueController {
       "news",
       async (job: Job) => {
         const { title, link, postedAt } = job.data;
-        //await this.sendMessage.send(`📰 ${title}\n\n${link}\n${postedAt}`);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await this.sendMessage.send(`📰 ${title}\n\n${link}\n${postedAt}`);
       },
       { 
-        connection: { host: "localhost", port: 6379 }, 
+        connection: { host: "redis", port: 6379 }, 
         concurrency: 1, 
         removeOnComplete: { age: 86400 }, 
         removeOnFail: { age: 86400 },
