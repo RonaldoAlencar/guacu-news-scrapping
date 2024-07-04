@@ -42,7 +42,15 @@ async function main() {
   ];
 
   const app = new App(
-    new NewsRepositoryDatabase(await new DatabaseConnection('db','root','root','news', logger).getConnection()),
+    new NewsRepositoryDatabase(
+      await new DatabaseConnection(
+        process.env.MYSQL_HOST || 'localhost',
+        process.env.MYSQL_USER || 'root',
+        process.env.MYSQL_PASSWORD || 'root',
+        process.env.MYSQL_DATABASE || 'news',
+        logger
+      ).getConnection()
+    ),
     queue,
     adapters,
     logger
