@@ -21,6 +21,6 @@ describe('SendWhatsappMessage', () => {
     await sendWhatsappMessage.send(input.message);
 
     expect(spyPost).toHaveBeenCalled();
-    expect(spyPost.mock.calls[0][1].textMessage.text).toBe(input.message);
+    expect(spyPost.mock.calls[0][1].text).toBe(input.message);
   });
 });
