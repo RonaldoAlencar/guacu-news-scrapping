@@ -21,7 +21,11 @@ export default class QueueController {
     );
 
     worker.on("completed", (job: Job) => {
-      console.log("Job completed", job.data.title);
+      console.log("Job completed", job?.data.title);
+    });
+
+    worker.on("failed", (job: Job | undefined, err: Error) => {
+      console.log("Job failed", job?.data.title, err);
     });
   }
 }
