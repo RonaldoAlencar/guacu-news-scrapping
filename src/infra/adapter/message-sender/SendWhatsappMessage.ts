@@ -9,17 +9,9 @@ export default class SendWhatsappMessage implements SendMessage {
     this.logger.logInfo(`Sending message to whatsapp`);
     await this.httpRequests.post(`${process.env.WHATSAPP_API_URL}/message/sendText/${process.env.WHATSAPP_INSTANCE_NAME}`, {
       "number": process.env.WHATSAPP_GROUP_ID,
-      "textMessage": {
-        "text": message
-      },
-        "options": {
-          "delay": 1200,
-          "presence": "composing",
-          "linkPreview": true
-        }, 
-      }, {
+      "text": message,
       headers: {
-        'Apikey': process.env.WHATSAPP_API_KEY,
+        'apikey': process.env.WHATSAPP_API_KEY,
       }
     });
   }
