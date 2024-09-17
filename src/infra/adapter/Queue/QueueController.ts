@@ -13,9 +13,9 @@ export default class QueueController {
       },
       { 
         connection: { host: process.env.REDIS_HOST, port: Number(process.env.REDIS_PORT) },
-        concurrency: 1, 
-        removeOnComplete: { age: 86400 }, 
-        removeOnFail: { age: 86400 },
+        concurrency: 10, 
+        removeOnComplete: { age: 86400 * 10 }, 
+        removeOnFail: { age: 86400 * 10 },
         runRetryDelay: 100000,
       }
     );
