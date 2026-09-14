@@ -43,6 +43,6 @@
     "dotenv": "^16.4.7",
     "mysql2": "^3.14.0",
     "node-cron": "^3.0.3",
-    "playwright": "^1.51.1"
+    "playwright": "1.51.1"
   }
 }
