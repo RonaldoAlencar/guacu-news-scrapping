@@ -1,7 +1,6 @@
-import { TNews } from "../../infra/adapter/news-scrapper/cheerio/ORegionalNewsScrapperAdapter";
+import { NewsItem } from "../entities/NewsItem";
 
 export default interface NewsScrapperAdapter {
-  scrapURL(numOfPages: number): Promise<TNews[]>;
-  getSiteBody(url: string): Promise<string>;
-  loadSiteBody(siteBody: string): void;
+  readonly source: string;
+  scrap(): Promise<NewsItem[]>;
 }

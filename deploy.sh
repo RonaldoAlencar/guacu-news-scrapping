@@ -1,43 +1,25 @@
 #!/bin/sh
+set -e
 
-# Load environment variables from .env file
-if [ -f .env ]
-then
-  export $(cat .env | sed 's/#.*//g' | xargs)
+HOST="${DEPLOY_HOST:-homelab}"
+REMOTE="${DEPLOY_PATH:-/mnt/hd_externo/apps/guacu-news-scrapping}"
+
+if [ ! -f .env ]; then
+  echo "Crie o arquivo .env (cp .example.env .env) antes do deploy."
+  exit 1
 fi
 
-# Install sshpass if not already installed
-if ! command -v sshpass &> /dev/null
-then
-  echo "sshpass could not be found, installing..."
-  sudo apt-get install sshpass -y
-fi
+echo "Enviando arquivos para ${HOST}:${REMOTE}"
+rsync -az \
+  --exclude node_modules \
+  --exclude dist \
+  --exclude coverage \
+  --exclude .git \
+  --exclude .env.homelab \
+  --exclude tmp-*.html \
+  ./ "${HOST}:${REMOTE}/"
 
-# Install dependencies and build the application
-echo "Installing dependencies..."
-npm install
+echo "Subindo container no homelab"
+ssh "${HOST}" "cd '${REMOTE}' && docker compose up -d --build"
 
-echo "Building the application..."
-npm run build
-
-# Deploy the application via SFTP
-echo "Deploying the application..."
-export SSHPASS=$SERVER_PASSWORD
-sshpass -e sftp $SERVER_USER@$SERVER_IP <<EOF
-  cd ./apps/guacu-news-scrapping
-  put -r dist
-  put package.json
-  put package-lock.json
-  bye
-EOF
-
-# Install dependencies and start the application
-echo "Installing dependencies..."
-sshpass -e ssh $SERVER_USER@$SERVER_IP <<EOF
-  cd ./apps/guacu-news-scrapping
-  source ~/.nvm/nvm.sh
-  npm install
-  pm2 restart $SERVER_APP_NAME
-EOF
-
-echo "Deployed successfully!"
+echo "Deploy concluído. Health: http://${HOST}:3015/health"

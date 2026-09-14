@@ -1,4 +1,8 @@
 /node_modules
 /dist
 .env
+.env.homelab
 /coverage
+/test-results
+/playwright-report
+tmp-*.html

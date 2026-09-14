@@ -1,2 +1,12 @@
-dist
 node_modules
+dist
+.env
+.env.homelab
+coverage
+.git
+README.md
+*.md
+deploy.sh
+seed
+src/**/*.spec.ts
+src/**/__fixtures__

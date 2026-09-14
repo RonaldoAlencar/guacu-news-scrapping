@@ -1,5 +1,7 @@
+import News from "../entities/News";
+
 export default interface Queue {
-  connect (connectionName: string): Promise<void>;
-  on (queueName: string, callback: Function): Promise<void>;
-  publish (queueName: string, data: any): Promise<void>;
+  connect(): Promise<void>;
+  publish(news: News): Promise<void>;
+  close(): Promise<void>;
 }

@@ -1,4 +1,21 @@
 services:
-  app:
-    container_name: guacu_news_scrapping
+  guacu-news-scrapping:
+    container_name: guacu-news-scrapping
     build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      TZ: America/Sao_Paulo
+      # MySQL e Redis do homelab usam network_mode: host.
+      MYSQL_HOST: host.docker.internal
+      REDIS_HOST: host.docker.internal
+      REDIS_DB: "2"
+      HEALTH_PORT: "3000"
+      WHATSAPP_API_URL: http://host.docker.internal:8080
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - "3015:3000"
+    shm_size: "1gb"

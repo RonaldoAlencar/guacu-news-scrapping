@@ -1,43 +1,89 @@
-# GUAÇU NEWS SCRAPPING
+# Guaçu News Scraping
 
-Um poderoso web scrapper para extrair notícias atualizadas das cidades de Mogi-Guaçu e Mogi-Mirim, ambas do estado de São Paulo e enviadas com o link e o título da matéria para aplicativos de comunicação. Mantenha-se informado com as últimas notícias da sua região de forma eficiente e automatizada na palma de sua mão.
+Coleta notícias de Mogi Guaçu, Mogi Mirim e da Baixa Mogiana e envia título + link para um grupo de WhatsApp pela [Evolution API](https://github.com/EvolutionAPI/evolution-api).
 
-## Início Rápido
+Fluxo: cron 8h e 18h (America/Sao_Paulo) → scrapers → MySQL (dedupe por link) → Redis/BullMQ → WhatsApp.
 
-Essas instruções irão ajudá-lo a obter uma cópia do projeto e executá-lo na sua máquina local para fins de desenvolvimento e teste.
+## Fontes
 
-### Pré-requisitos
+- [O Regional](https://oregional.net/topico/mogiguacu/)
+- [Portal da Cidade Mogi Mirim](https://mogimirim.portaldacidade.com/noticias)
+- [Guaçu Agora](https://guacuagora.com.br/) (Playwright, por causa do Cloudflare)
+- [Gazeta Guaçuana](https://www.gazetaguacuana.com.br/) (Playwright; o servidor responde 403 no fetch simples)
+- [Tribuna do Guaçu](https://portaltribunadoguacu.com.br/) (só matérias locais)
+- [Mogi Guaçu Acontece](https://mogiguacuacontece.com.br/)
+- [O Impacto](https://oimpactomogi.com.br/tag/mogi-guacu/) (tags Mogi Guaçu e Mogi Mirim)
+- [G1 Campinas e Região](https://g1.globo.com/sp/campinas-regiao/) (RSS filtrado pelas duas cidades)
 
-Antes de começar, certifique-se de ter as seguintes ferramentas instaladas em sua máquina:
-- ![Git](https://img.icons8.com/color/20/000000/git.png) [Git](https://git-scm.com) - Sistema de controle de versão distribuído.
-- ![Node.js](https://img.icons8.com/color/20/000000/nodejs.png) [Node.js](https://nodejs.org/en/) - Ambiente de execução JavaScript.
-- ![NPM](https://img.icons8.com/color/20/000000/npm.png) [NPM](https://www.npmjs.com/) - Gerenciador de pacotes para JavaScript.
-- ![Docker](https://img.icons8.com/color/20/000000/docker.png) [Docker](https://www.docker.com/) - Plataforma para desenvolvimento, envio e execução de aplicações em containers.
-- ![Docker Compose](https://img.icons8.com/color/20/000000/docker.png) [Docker Compose](https://docs.docker.com/compose/) - Ferramenta para definição e execução de aplicações Docker multi-container.
+## Homelab
 
-Além disso, é bom ter um editor para trabalhar com o código, como [VSCode](https://code.visualstudio.com/).
+O app **não** sobe MySQL, Redis nem Evolution. Usa os serviços que já existem no homelab:
 
-**Para começar a usar o GUAÇU NEWS SCRAPPING, siga os passos abaixo:**
+| Serviço | Como o container acessa |
+|---------|-------------------------|
+| MySQL 8 (`database-mysql8`, porta 3306) | `host.docker.internal` |
+| Redis (`redis`, porta 6379, sem senha) | `host.docker.internal`, `REDIS_DB=2` |
+| Evolution API (porta 8080) | `http://host.docker.internal:8080` |
 
-1. Clone o repositório para a sua máquina local usando `git clone`.
-2. Navegue até o diretório do projeto usando `cd`.
-3. Instale todas as dependências necessárias do projeto usando `npm install`.
-4. Suba os container docker para aplicação se conectar usando o comando `npm run services:up`
-5. Inicie a aplicação no modo desenvolvimento com o comando `npm run start:dev`
+O schema (`database news`, tabela `news`) é criado/atualizado no boot. Health check na porta **3015** (a 3000 do homelab já está ocupada).
 
-Agora você deve ter o GUAÇU NEWS SCRAPPING rodando localmente e pronto para começar a extrair as últimas notícias de Mogi-Guaçu e Mogi-Mirim.
+## Deploy
 
-## Tecnologias Utilizadas
+No homelab o padrão é o mesmo da landing da Bianca: um `docker compose up -d --build`.
 
-Este projeto utiliza as seguintes tecnologias:
+```bash
+cp .example.env .env
+# preencha WhatsApp, MySQL e Redis com as credenciais do homelab
 
-- ![Node.js](https://img.icons8.com/color/20/000000/nodejs.png) [Node.js](https://nodejs.org/en/) - Ambiente de execução JavaScript usado para desenvolver o servidor.
-- ![TypeScript](https://img.icons8.com/color/20/000000/typescript.png) [TypeScript](https://www.typescriptlang.org/) - Superconjunto de JavaScript que adiciona tipagem estática e outros recursos.
-- ![Data Streaming](https://img.icons8.com/color/20/000000/data-configuration.png) [Apache Kafka](https://kafka.apache.org/) - Plataforma de streaming de eventos distribuídos usada para construir pipelines de dados em tempo real.
-- ![MySQL](https://img.icons8.com/color/20/000000/mysql-logo.png) [MySQL 8](https://www.mysql.com/) - Sistema de gerenciamento de banco de dados relacional usado para armazenar e recuperar dados.
-- ![Kafka UI](https://img.icons8.com/color/20/000000/red-panda.png) [Kafka UI Redpanda](https://vectorized.io/redpanda/kafka-ui/) - Interface de usuário para visualizar e gerenciar tópicos Kafka.
+chmod +x deploy.sh
+./deploy.sh
+```
 
-Por favor, note que os ícones podem não corresponder exatamente às tecnologias mencionadas devido à disponibilidade limitada de ícones.
+O script envia o projeto para `/mnt/hd_externo/apps/guacu-news-scrapping/` e sobe o container `guacu-news-scrapping`.
 
+Health: `http://192.168.15.200:3015/health`
 
-> **Observação:** Este sistema faz requisições POST para a API oficial do Telegram (desativado por padrão) e para a API não oficial do WhatsApp [(Evolution API)](https://github.com/EvolutionAPI/evolution-api/tree/main), que deve estar previamente configurada. As configurações de ambiente (endpoins tokens de autenticação etc..) deverão serem configuradas no arquivo `.env`.
+## Desenvolvimento local
+
+```bash
+cp .example.env .env
+# aponte MYSQL_* e REDIS_* para o homelab (192.168.15.200)
+
+npm install
+npm run playwright:install
+npm run start:dev
+```
+
+Coleta única, só listando no terminal (sem MySQL, Redis ou WhatsApp):
+
+```bash
+npm run scrape:once
+```
+
+`npm run database:seed` **apaga** a tabela `news` e só roda com `CONFIRM_DROP=true`. Não use no MySQL do homelab.
+
+## Variáveis de ambiente
+
+Veja [`.example.env`](.example.env). As que o app usa de fato:
+
+| Variável | Função |
+|----------|--------|
+| `WHATSAPP_API_URL` | Base da Evolution, sem barra no final |
+| `WHATSAPP_INSTANCE_NAME` | Instância no path `/message/sendText/{instance}` |
+| `WHATSAPP_API_KEY` | Header `Apikey` |
+| `WHATSAPP_GROUP_ID` | Número ou JID do grupo |
+| `MYSQL_*` | Banco de deduplicação no MySQL do homelab |
+| `REDIS_*` | Fila BullMQ no Redis do homelab |
+| `HEALTH_PORT` | Porta do `/health` (dentro do container: 3000) |
+| `SEND_DELAY_MS` | Intervalo entre envios no WhatsApp |
+| `DRY_RUN` / `RUN_ONCE` | Listar sem persistir/enviar |
+
+No Compose, `MYSQL_HOST`, `REDIS_HOST` e `WHATSAPP_API_URL` são sobrescritos para `host.docker.internal`.
+
+## Testes
+
+```bash
+npm test
+```
+
+Os testes usam fixtures HTML/RSS. Não batem na rede.
